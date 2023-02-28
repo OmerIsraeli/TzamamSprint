@@ -18,7 +18,7 @@ RECEIVE_FROM_CLONE = 1
 class MyPlayer:
     def __init__(self):
         self.turn_num = 0
-        self.stage = 0
+        self.stage = 1
         self.percent = 0.75
         self.game = None
         self.my_capital = None
@@ -27,7 +27,8 @@ class MyPlayer:
     def set_game(self, game):
         self.game = game
         self.my_capital = self.game.get_my_icepital_icebergs()[0]
-        self.enemy_capital = self.game.get_enemy_icepital_icebergs()[0]
+        if game.get_enemy_icepital_icebergs():
+            self.enemy_capital = game.get_enemy_icepital_icebergs()[0]
 
     def do_turn(self):
         self.determine_state()
@@ -45,21 +46,18 @@ class MyPlayer:
         icebergs = self.game.get_all_icebergs()
         icebergs.remove(self.enemy_capital)
         self.turn_num += 1
-        if self.turn_num == 1:
-          if self.my_capital.can_send_penguins_to_set_siege(self.enemy_capital,self.my_capital.penguin - 1):
-              self.my_capital.send_penguins_to_set_siege(self.enemy_capital, self.my_capital.penguin - 1)
-        if self.turn_num == 2:
-            pg: PenguinGroup = self.game.get_my_penguin_groups()[0]
-            pg.accelerate()
-        if self.turn_num < 22:
+        if self.stage == 1:
             my_capital = self.game.get_my_icepital_icebergs()[0]
             print(my_capital.upgrade_cost)
-            my_capital.upgrade()
+            if my_capital.can_upgrade():
+                my_capital.upgrade()
+                self.stage += 1
         clone = self.game.get_cloneberg()
         if self.stage == 2:
             if clone and self.my_capital.penguin_amount > 10:
                 minimal_to_clone = min(icebergs, key=lambda iceberg: iceberg.get_turns_till_arrival(clone))
                 self.send_penguins(self.my_capital.penguin_amount, self.my_capital, minimal_to_clone)
+                self.stage += 1
         # Initial play -  here we want to spread quicly
         else:
             self.handle_clone(clone, icebergs)
@@ -109,10 +107,10 @@ class MyPlayer:
         if my_capital.can_upgrade() and my_capital.upgrade_cost < self.percent * my_capital.penguin_amount:
             my_capital.upgrade()
             print(my_capital, "upgraded to level", my_capital.level)
-        else:
-            cloneberg = self.game.get_cloneberg()
-            if self.turn_num % max(WAIT_MIN, self.game.cloneberg_max_pause_turns) == 0:
-                self.send_penguins(my_capital.level, my_capital, cloneberg)
+        # else:
+        #     cloneberg = self.game.get_cloneberg()
+        #     if self.turn_num % max(WAIT_MIN, self.game.cloneberg_max_pause_turns) == 0:
+        #         self.send_penguins(my_capital.level, my_capital, cloneberg)
 
     def attack_dst(self, list_of_attackers, dst, all_in=True):
         FACTOR = 1 if all_in else ATTACK_FACTOR
