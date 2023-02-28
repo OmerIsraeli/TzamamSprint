@@ -42,22 +42,18 @@ class MyPlayer:
         """
         # At the beginning we spread to 3 icebergs
 
-        print(self.turn_num)
+        clone = self.game.get_cloneberg()
+        print(self.turn_num, self.stage)
         icebergs = self.game.get_all_icebergs()
         icebergs.remove(self.enemy_capital)
         self.turn_num += 1
-        if self.stage == 1:
+        if self.turn_num < 3:
             my_capital = self.game.get_my_icepital_icebergs()[0]
             print(my_capital.upgrade_cost)
             if my_capital.can_upgrade():
                 my_capital.upgrade()
-                self.stage += 1
-        clone = self.game.get_cloneberg()
-        if self.stage == 2:
-            if clone and self.my_capital.penguin_amount > 10:
-                minimal_to_clone = min(icebergs, key=lambda iceberg: iceberg.get_turns_till_arrival(clone))
-                self.send_penguins(self.my_capital.penguin_amount, self.my_capital, minimal_to_clone)
-                self.stage += 1
+        elif self.stage == 1:
+           self.stage1(clone,icebergs)
         # Initial play -  here we want to spread quicly
         else:
             self.handle_clone(clone, icebergs)
@@ -116,10 +112,9 @@ class MyPlayer:
         FACTOR = 1 if all_in else ATTACK_FACTOR
         for attacker in list_of_attackers:
             if attacker not in self.game.get_my_icepital_icebergs():
-                attacker.send_penguins(dst, attacker.penguin_amount * FACTOR)
-                print(attacker, "sends", (attacker.penguin_amount * FACTOR), "penguins to", dst)
+                self.send_penguins(attacker.penguin_amount * FACTOR,attacker,dst)
             else:
-                attacker.send_penguins(dst, attacker.penguin_amount // 2)
+                self.send_penguins(attacker.penguin_amount // 2,attacker,dst)
                 print(attacker, "sends", (attacker.penguin_amount // 2), "penguins to", dst)
 
     def attack(self, list_of_attackers):
@@ -140,7 +135,7 @@ class MyPlayer:
         for iceberg in my_icegergs:
             if destination:
                 print(iceberg, "sends", (iceberg.penguin_amount), "penguins to", destination)
-                iceberg.send_penguins(destination, iceberg.penguin_amount)
+                self.send_penguins(iceberg.penguin_amount,iceberg,destination)
 
     def initial_spread(self):
         # If there are any neutral icebergs.
@@ -165,7 +160,7 @@ class MyPlayer:
             sum += iceberg.penguin_amount - 1
         if sum >= dest_penguin_amount + 1:
             for iceberg in my_iceberg_list:
-                iceberg.send_penguins(chosen_dest, iceberg.penguin_amount - 1)
+                self.send_penguins( iceberg.penguin_amount - 1,iceberg,chosen_dest)
 
     def spread_to_enemy(self, all_in=False):
         chosen_destinations = []
@@ -263,9 +258,9 @@ class MyPlayer:
         if sum >= dest_penguin_amount + 1:
             for iceberg in my_iceberg_list:
                 if reduce < iceberg.penguin_amount - 1:
-                    iceberg.send_penguins(chosen_dest, reduce)
+                    self.send_penguins(reduce,iceberg,chosen_dest)
                 else:
-                    iceberg.send_penguins(chosen_dest, iceberg.penguin_amount - 1)
+                    self.send_penguins(iceberg.penguin_amount - 1,iceberg,chosen_dest)
                 reduce = max(reduce - (iceberg.penguin_amount - 1), 0)
 
     def initial_spread_to_enemy(self, all_in=False):
@@ -297,3 +292,11 @@ class MyPlayer:
             if self.on_the_way(iceberg):
                 count += 1
         return count
+
+    def stage1(self, clone, icebergs):
+        if clone and self.my_capital.penguin_amount > 10:
+            minimal_to_clone = sorted(icebergs, key=lambda iceberg: iceberg.get_turns_till_arrival(clone))
+            for ice in minimal_to_clone:
+                if self.my_capital.penguin_amount > ice.penguin_amount + ice.penguins_per_turn * self.my_capital.get_turns_till_arrival(
+                        ice):
+                    self.send_penguins(ice.penguin_amount, self.my_capital, ice)
