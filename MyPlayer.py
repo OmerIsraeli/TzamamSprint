@@ -55,7 +55,7 @@ class MyPlayer:
                 print(attacker, "sends", (attacker.penguin_amount // 2), "penguins to", dst)
 
     def attack(self, list_of_attackers):
-        self.attack_dst(self.game.get_enemy_icepital_icebergs()[0])
+        self.attack_dst(list_of_attackers, self.game.get_enemy_icepital_icebergs()[0])
         # for attacker in list_of_attackers:
         #     if attacker not in self.game.get_my_icepital_icebergs():
         #         attacker.send_penguins(self.game.get_enemy_icepital_icebergs()[0], attacker.penguin_amount)
