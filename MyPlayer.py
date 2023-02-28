@@ -206,14 +206,14 @@ class MyPlayer:
         sum = 0
         for iceberg in my_iceberg_list:
             sum += iceberg.penguin_amount - 1
-        reduce = sum
+        reduce = dest_penguin_amount + 1
         if sum >= dest_penguin_amount + 1:
             for iceberg in my_iceberg_list:
                 if reduce < iceberg.penguin_amount - 1:
-                    iceberg.send_penguins(chosen_dest,reduce)
+                    iceberg.send_penguins(chosen_dest, reduce)
                 else:
                     iceberg.send_penguins(chosen_dest,  iceberg.penguin_amount - 1)
-                reduce = max(sum - (iceberg.penguin_amount -1),0)
+                reduce = max(reduce - (iceberg.penguin_amount -1),0)
 
     def initial_spread_to_enemy(self, all_in=False):
         chosen_destinations = []
