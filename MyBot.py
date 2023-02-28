@@ -2,6 +2,8 @@
 This is an example for a bot.
 """
 from penguin_game import *
+from Utils import *
+
 
 
 def do_turn(game):
@@ -11,33 +13,13 @@ def do_turn(game):
     :param game: the current game state.
     :type game: Game
     """
-    SPREAD = 0
-    DEFEND = 1
-    ATTACK = 2
-    UPGRADE = 3
-    funcs = {SPREAD: spread, DEFEND: defend, ATTACK: attack, UPGRADE: upgrade}
-    state = 0
 
-    determine_state()
+
+    state = determine_state()
+    funcs[state]()
 
 
 
-
-
-def determine_state():
-    pass
-
-def spread():
-    pass
-
-def upgrade():
-    pass
-
-def attack():
-    pass
-
-def defend():
-    pass
 
 
     # # Go over all of my icepitals and conquer icebergs
@@ -52,7 +34,7 @@ def defend():
     #     else:
     #         # Target an enemy iceberg.
     #         destination = game.get_enemy_icebergs()[0]  # type: Iceberg
-    #         destination.
+    #         destination
     #
     #     # The amount of penguins the target has.
     #     destination_penguin_amount = destination.penguin_amount  # type: int

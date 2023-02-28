@@ -1,4 +1,3 @@
-import Utils
 from penguin_game import *
 
 NAT_ICEBREGS = 4
@@ -6,7 +5,7 @@ SPREAD = 0
 DEFEND = 1
 ATTACK = 2
 UPGRADE = 3
-funcs = {SPREAD: Utils.spread, DEFEND: Utils.defend, ATTACK: Utils.attack, UPGRADE: Utils.upgrade}
+funcs = {SPREAD: spread, DEFEND: defend, ATTACK: attack, UPGRADE: upgrade}
 
 
 def upgrade(game: Game, precent: Int):
@@ -47,24 +46,25 @@ def spread(game):
                 my_iceberg.send_penguins(dest, destination_penguin_amount + 1)
 
 
-def determine_state(game: Game):
+def determine_state(self, game: Game):
     """
        Makes decisions of the states.
 
        :param game: the current game state.
        :type game: Game
-       """
+    """
     # If I want to spread
-    if game.get_neutral_icebergs() and len(game.get_my_icebergs()) < NAT_ICEBREGS:
-        # Target a neutral iceberg.
+    if self.turn_num == 0:
         return SPREAD
-    else:
-        if game.get_my_icepital_icebergs():
-            return ATTACK
-        else:
-            return DEFEND
+   max_dist =  0
+   my_iceberg_list = game.get_my_icebergs()
+   for iceberg in my_iceberg_list:
+       if
 
-#
+
+
+
+
 # # The amount of penguins the target has.
 # destination_penguin_amount = destination.penguin_amount  # type: int
 #
