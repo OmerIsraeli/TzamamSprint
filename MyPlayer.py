@@ -12,14 +12,18 @@ funcs = {SPREAD: spread, DEFEND: defend, ATTACK: attack, UPGRADE: upgrade}
 class MyPlayer:
     _instance = None
 
-    def __new__(cls):
+    def __new__(cls, game: Game):
         if not isinstance(cls._instance, cls):
             cls._instance = object.__new__(cls)
         return cls._instance
 
-    def __init__(self) -> None:
+    def __init__(self, game: Game) -> None:
         super().__init__()
-        self.turn_num = 0
+        self.turn_num: int = 0
+        self.game: Game = game
+
+    def do_turn(self):
+        funcs[self.determine_state()]()
 
     def upgrade(self, game: Game):
         pass
@@ -54,7 +58,7 @@ class MyPlayer:
                     # print(my_iceberg, "sends", (destination_penguin_amount + 1), "penguins to", dest)
                     my_iceberg.send_penguins(dest, destination_penguin_amount + 1)
 
-    def determine_state(self, game: Game):
+    def determine_state(self):
         """
            Makes decisions of the states.
 
@@ -66,6 +70,6 @@ class MyPlayer:
             return SPREAD
 
         max_dist = 0
-        my_iceberg_list = game.get_my_icebergs()
+        my_iceberg_list = self.game.get_my_icebergs()
         for iceberg in my_iceberg_list:
             if
