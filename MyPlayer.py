@@ -238,8 +238,9 @@ class MyPlayer:
         return count
 
     def send_penguins(self, amount, src, dst):
-        print(src, "sends", amount, "penguins to", dst)
-        src.send_penguins(dst, amount)
+        if not src.is_under_siege:
+            print(src, "sends", amount, "penguins to", dst)
+            src.send_penguins(dst, amount)
 
     def initial_spread_to_neutral(self):
         chosen_destinations = []
