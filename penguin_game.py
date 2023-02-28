@@ -118,64 +118,6 @@ Class._hx_class = Class
 _hx_classes[u"Class"] = Class
 
 
-class EReg(object):
-    _hx_class_name = u"EReg"
-    __slots__ = (u"pattern", u"_hx_global")
-    _hx_fields = [u"pattern", u"global"]
-    _hx_methods = [u"replace"]
-
-    def __init__(self,r,opt):
-        self._hx_global = False
-        options = 0
-        _g1 = 0
-        _g = len(opt)
-        while (_g1 < _g):
-            i = _g1
-            _g1 = (_g1 + 1)
-            c = (-1 if ((i >= len(opt))) else ord(opt[i]))
-            if (c == 109):
-                options = (options | python_lib_Re.M)
-            if (c == 105):
-                options = (options | python_lib_Re.I)
-            if (c == 115):
-                options = (options | python_lib_Re.S)
-            if (c == 117):
-                options = (options | python_lib_Re.U)
-            if (c == 103):
-                self._hx_global = True
-        self.pattern = python_lib_Re.compile(r,options)
-
-    def replace(self,s,by):
-        _this = by.split(u"$$")
-        by1 = u"_hx_#repl#__".join([python_Boot.toString1(x1,u'') for x1 in _this])
-        def _hx_local_0(x):
-            res = by1
-            g = x.groups()
-            _g1 = 0
-            _g = len(g)
-            while (_g1 < _g):
-                i = _g1
-                _g1 = (_g1 + 1)
-                gs = g[i]
-                if (gs is None):
-                    continue
-                delimiter = (u"$" + HxOverrides.stringOrNull(unicode((i + 1))))
-                _this1 = (list(res) if ((delimiter == u"")) else res.split(delimiter))
-                res = gs.join([python_Boot.toString1(x1,u'') for x1 in _this1])
-            _this2 = res.split(u"_hx_#repl#__")
-            res = u"$".join([python_Boot.toString1(x1,u'') for x1 in _this2])
-            return res
-        replace = _hx_local_0
-        return python_lib_Re.sub(self.pattern,replace,s,(0 if (self._hx_global) else 1))
-
-    @staticmethod
-    def _hx_empty_init(_hx_o):
-        _hx_o.pattern = None
-        _hx_o._hx_global = None
-EReg._hx_class = EReg
-_hx_classes[u"EReg"] = EReg
-
-
 class MapObject(BaseObject):
     _hx_class_name = u"MapObject"
     __slots__ = ()
@@ -240,11 +182,11 @@ GameObject._hx_class = GameObject
 _hx_classes[u"GameObject"] = GameObject
 
 
-class Iceberg(GameObject):
-    _hx_class_name = u"Iceberg"
-    __slots__ = (u"penguin_amount", u"_hx___penguin_group_max_speed", u"is_icepital", u"upgrade_value", u"upgrade_cost", u"level", u"upgrade_level_limit", u"cost_factor", u"_hx___can_upgrade_object", u"penguins_per_turn")
-    _hx_fields = [u"penguin_amount", u"__penguin_group_max_speed", u"is_icepital", u"upgrade_value", u"upgrade_cost", u"level", u"upgrade_level_limit", u"cost_factor", u"__can_upgrade_object", u"penguins_per_turn"]
-    _hx_methods = [u"get_turns_till_arrival", u"can_send_penguins", u"send_penguins", u"can_upgrade", u"upgrade"]
+class IceBuilding(GameObject):
+    _hx_class_name = u"IceBuilding"
+    __slots__ = (u"penguin_amount", u"_hx___penguin_group_max_speed")
+    _hx_fields = [u"penguin_amount", u"__penguin_group_max_speed"]
+    _hx_methods = [u"get_turns_till_arrival", u"can_send_penguins", u"send_penguins"]
     _hx_statics = []
     _hx_interfaces = []
     _hx_super = GameObject
@@ -261,15 +203,15 @@ class Iceberg(GameObject):
             return None
 
     def can_send_penguins(self,destination,penguinAmount):
-        if (not Std._hx_is(destination,Iceberg)):
+        if (not Std._hx_is(destination,IceBuilding)):
             return False
         if (((penguinAmount > self.penguin_amount) or ((self.penguin_amount < 1))) or (((destination == self) and ((penguinAmount < 1))))):
             return False
         return True
 
     def send_penguins(self,destination,penguinAmount):
-        if (not Std._hx_is(destination,Iceberg)):
-            print u"The destination is not a Iceberg!, Check your parameters"
+        if (not Std._hx_is(destination,IceBuilding)):
+            print u"The destination is not a IceBuilding!, Check your parameters"
             return
         if (penguinAmount <= self.penguin_amount):
             _hx_local_0 = self
@@ -279,6 +221,99 @@ class Iceberg(GameObject):
         orderArgs = (((u"\"destination\": " + Std.string(destination.unique_id)) + u", \"penguin_amount\": ") + Std.string(penguinAmount))
         BaseObject._game._addOrder(u"send_penguins",self,orderArgs)
 
+    @staticmethod
+    def _hx_empty_init(_hx_o):
+        _hx_o.penguin_amount = None
+        _hx_o._hx___penguin_group_max_speed = None
+IceBuilding._hx_class = IceBuilding
+_hx_classes[u"IceBuilding"] = IceBuilding
+
+
+class Cloneberg(IceBuilding):
+    _hx_class_name = u"Cloneberg"
+    __slots__ = (u"all_penguin_amount",)
+    _hx_fields = [u"all_penguin_amount"]
+    _hx_methods = []
+    _hx_statics = []
+    _hx_interfaces = []
+    _hx_super = IceBuilding
+
+
+    @staticmethod
+    def _hx_empty_init(_hx_o):
+        _hx_o.all_penguin_amount = None
+Cloneberg._hx_class = Cloneberg
+_hx_classes[u"Cloneberg"] = Cloneberg
+
+
+class EReg(object):
+    _hx_class_name = u"EReg"
+    __slots__ = (u"pattern", u"_hx_global")
+    _hx_fields = [u"pattern", u"global"]
+    _hx_methods = [u"replace"]
+
+    def __init__(self,r,opt):
+        self._hx_global = False
+        options = 0
+        _g1 = 0
+        _g = len(opt)
+        while (_g1 < _g):
+            i = _g1
+            _g1 = (_g1 + 1)
+            c = (-1 if ((i >= len(opt))) else ord(opt[i]))
+            if (c == 109):
+                options = (options | python_lib_Re.M)
+            if (c == 105):
+                options = (options | python_lib_Re.I)
+            if (c == 115):
+                options = (options | python_lib_Re.S)
+            if (c == 117):
+                options = (options | python_lib_Re.U)
+            if (c == 103):
+                self._hx_global = True
+        self.pattern = python_lib_Re.compile(r,options)
+
+    def replace(self,s,by):
+        _this = by.split(u"$$")
+        by1 = u"_hx_#repl#__".join([python_Boot.toString1(x1,u'') for x1 in _this])
+        def _hx_local_0(x):
+            res = by1
+            g = x.groups()
+            _g1 = 0
+            _g = len(g)
+            while (_g1 < _g):
+                i = _g1
+                _g1 = (_g1 + 1)
+                gs = g[i]
+                if (gs is None):
+                    continue
+                delimiter = (u"$" + HxOverrides.stringOrNull(unicode((i + 1))))
+                _this1 = (list(res) if ((delimiter == u"")) else res.split(delimiter))
+                res = gs.join([python_Boot.toString1(x1,u'') for x1 in _this1])
+            _this2 = res.split(u"_hx_#repl#__")
+            res = u"$".join([python_Boot.toString1(x1,u'') for x1 in _this2])
+            return res
+        replace = _hx_local_0
+        return python_lib_Re.sub(self.pattern,replace,s,(0 if (self._hx_global) else 1))
+
+    @staticmethod
+    def _hx_empty_init(_hx_o):
+        _hx_o.pattern = None
+        _hx_o._hx_global = None
+EReg._hx_class = EReg
+_hx_classes[u"EReg"] = EReg
+
+
+class Iceberg(IceBuilding):
+    _hx_class_name = u"Iceberg"
+    __slots__ = (u"is_icepital", u"upgrade_value", u"upgrade_cost", u"level", u"upgrade_level_limit", u"cost_factor", u"_hx___can_upgrade_object", u"penguins_per_turn")
+    _hx_fields = [u"is_icepital", u"upgrade_value", u"upgrade_cost", u"level", u"upgrade_level_limit", u"cost_factor", u"__can_upgrade_object", u"penguins_per_turn"]
+    _hx_methods = [u"can_upgrade", u"upgrade"]
+    _hx_statics = []
+    _hx_interfaces = []
+    _hx_super = IceBuilding
+
+
     def can_upgrade(self):
         return self._hx___can_upgrade_object
 
@@ -287,8 +322,6 @@ class Iceberg(GameObject):
 
     @staticmethod
     def _hx_empty_init(_hx_o):
-        _hx_o.penguin_amount = None
-        _hx_o._hx___penguin_group_max_speed = None
         _hx_o.is_icepital = None
         _hx_o.upgrade_value = None
         _hx_o.upgrade_cost = None
@@ -481,7 +514,7 @@ _hx_classes[u"_ObjectParser.Promise"] = _ObjectParser_Promise
 class ObjectParser(object):
     _hx_class_name = u"ObjectParser"
     __slots__ = ()
-    _hx_statics = [u"__loadVectorOfBaseObjects_Player", u"__loadVectorOfBaseObjects_Iceberg", u"__loadVectorOfBaseObjects_Location", u"__loadVectorOfBaseObjects_PenguinGroup", u"__loadVectorOfBaseObjects_GameObject", u"__loadVectorOfBaseObjects_MapObject", u"__loadVectorOfBaseObjects_PirateGame", u"__loadVectorOfBaseObjects_BaseObject", u"__loadVectorBuiltins_Bool", u"__loadVectorBuiltins_String", u"__loadVectorBuiltins_Int", u"__submittedObjects", u"__submittedTemporaryObjects", u"__objectsWaitList", u"__currentNamespace", u"__gameObjectClasses", u"_nativeAPI", u"_parseTurn", u"__submitObject", u"__updateObjects", u"__loadObject", u"__loadFields", u"__loadVectorOfUnknownType", u"__addPromise", u"__fulfilPromise", u"__createEmptyInstance", u"__getField", u"__setField"]
+    _hx_statics = [u"__loadVectorOfBaseObjects_Player", u"__loadVectorOfBaseObjects_Iceberg", u"__loadVectorOfBaseObjects_PenguinGroup", u"__loadVectorOfBaseObjects_Location", u"__loadVectorOfBaseObjects_Cloneberg", u"__loadVectorOfBaseObjects_IceBuilding", u"__loadVectorOfBaseObjects_GameObject", u"__loadVectorOfBaseObjects_MapObject", u"__loadVectorOfBaseObjects_PirateGame", u"__loadVectorOfBaseObjects_BaseObject", u"__loadVectorBuiltins_Bool", u"__loadVectorBuiltins_String", u"__loadVectorBuiltins_Int", u"__submittedObjects", u"__submittedTemporaryObjects", u"__objectsWaitList", u"__currentNamespace", u"__gameObjectClasses", u"_nativeAPI", u"_parseTurn", u"__submitObject", u"__updateObjects", u"__loadObject", u"__loadFields", u"__loadVectorOfUnknownType", u"__addPromise", u"__fulfilPromise", u"__createEmptyInstance", u"__getField", u"__setField"]
 
     @staticmethod
     def _hx___loadVectorOfBaseObjects_Player(args,ignored):
@@ -518,6 +551,23 @@ class ObjectParser(object):
             ObjectParser._hx___addPromise(otherObjectId,_ObjectParser_Promise(object,_ObjectParser_PromiseType.Update(newInitValue,index)))
 
     @staticmethod
+    def _hx___loadVectorOfBaseObjects_PenguinGroup(args,ignored):
+        instanceField = (None if ((len(args) == 0)) else args.pop())
+        initValueArray = (None if ((len(args) == 0)) else args.pop())
+        object = (None if ((len(args) == 0)) else args.pop())
+        this1 = [None]*len(initValueArray)
+        newInitValue = this1
+        ObjectParser._nativeAPI.setField(object,instanceField,newInitValue)
+        _g1 = 0
+        _g = len(initValueArray)
+        while (_g1 < _g):
+            index = _g1
+            _g1 = (_g1 + 1)
+            value = initValueArray[index]
+            otherObjectId = value.get(u"object_id")
+            ObjectParser._hx___addPromise(otherObjectId,_ObjectParser_Promise(object,_ObjectParser_PromiseType.Update(newInitValue,index)))
+
+    @staticmethod
     def _hx___loadVectorOfBaseObjects_Location(args,ignored):
         instanceField = (None if ((len(args) == 0)) else args.pop())
         initValueArray = (None if ((len(args) == 0)) else args.pop())
@@ -535,7 +585,24 @@ class ObjectParser(object):
             ObjectParser._hx___addPromise(otherObjectId,_ObjectParser_Promise(object,_ObjectParser_PromiseType.Update(newInitValue,index)))
 
     @staticmethod
-    def _hx___loadVectorOfBaseObjects_PenguinGroup(args,ignored):
+    def _hx___loadVectorOfBaseObjects_Cloneberg(args,ignored):
+        instanceField = (None if ((len(args) == 0)) else args.pop())
+        initValueArray = (None if ((len(args) == 0)) else args.pop())
+        object = (None if ((len(args) == 0)) else args.pop())
+        this1 = [None]*len(initValueArray)
+        newInitValue = this1
+        ObjectParser._nativeAPI.setField(object,instanceField,newInitValue)
+        _g1 = 0
+        _g = len(initValueArray)
+        while (_g1 < _g):
+            index = _g1
+            _g1 = (_g1 + 1)
+            value = initValueArray[index]
+            otherObjectId = value.get(u"object_id")
+            ObjectParser._hx___addPromise(otherObjectId,_ObjectParser_Promise(object,_ObjectParser_PromiseType.Update(newInitValue,index)))
+
+    @staticmethod
+    def _hx___loadVectorOfBaseObjects_IceBuilding(args,ignored):
         instanceField = (None if ((len(args) == 0)) else args.pop())
         initValueArray = (None if ((len(args) == 0)) else args.pop())
         object = (None if ((len(args) == 0)) else args.pop())
@@ -765,10 +832,14 @@ class ObjectParser(object):
                 ObjectParser._hx___loadVectorOfBaseObjects_MapObject(args,None)
             if (listType == u"GameObject"):
                 ObjectParser._hx___loadVectorOfBaseObjects_GameObject(args,None)
-            if (listType == u"PenguinGroup"):
-                ObjectParser._hx___loadVectorOfBaseObjects_PenguinGroup(args,None)
+            if (listType == u"IceBuilding"):
+                ObjectParser._hx___loadVectorOfBaseObjects_IceBuilding(args,None)
+            if (listType == u"Cloneberg"):
+                ObjectParser._hx___loadVectorOfBaseObjects_Cloneberg(args,None)
             if (listType == u"Location"):
                 ObjectParser._hx___loadVectorOfBaseObjects_Location(args,None)
+            if (listType == u"PenguinGroup"):
+                ObjectParser._hx___loadVectorOfBaseObjects_PenguinGroup(args,None)
             if (listType == u"Iceberg"):
                 ObjectParser._hx___loadVectorOfBaseObjects_Iceberg(args,None)
             if (listType == u"Player"):
@@ -824,13 +895,16 @@ _hx_classes[u"ObjectParser"] = ObjectParser
 
 class PenguinGroup(GameObject):
     _hx_class_name = u"PenguinGroup"
-    __slots__ = (u"source", u"destination", u"penguin_amount", u"turns_till_arrival")
-    _hx_fields = [u"source", u"destination", u"penguin_amount", u"turns_till_arrival"]
-    _hx_methods = []
+    __slots__ = (u"source", u"destination", u"penguin_amount", u"turns_till_arrival", u"current_speed", u"cloneberg_pause_turns")
+    _hx_fields = [u"source", u"destination", u"penguin_amount", u"turns_till_arrival", u"current_speed", u"cloneberg_pause_turns"]
+    _hx_methods = [u"accelerate"]
     _hx_statics = []
     _hx_interfaces = []
     _hx_super = GameObject
 
+
+    def accelerate(self):
+        BaseObject._game._addOrder(u"accelerate_penguin_group",self)
 
     @staticmethod
     def _hx_empty_init(_hx_o):
@@ -838,21 +912,28 @@ class PenguinGroup(GameObject):
         _hx_o.destination = None
         _hx_o.penguin_amount = None
         _hx_o.turns_till_arrival = None
+        _hx_o.current_speed = None
+        _hx_o.cloneberg_pause_turns = None
 PenguinGroup._hx_class = PenguinGroup
 _hx_classes[u"PenguinGroup"] = PenguinGroup
 
 
 class Game(BaseObject):
     _hx_class_name = u"Game"
-    __slots__ = (u"_hx___players", u"_hx___turnTime", u"_hx___turnStartTime", u"_hx___numPlayers", u"_hx___recoverErrors", u"_runnerFullStacktrace", u"max_points", u"max_turns", u"turn", u"_hx___me", u"_hx___enemies", u"_hx___orders", u"_hx___nativeAPI", u"_hx___icepital_holders", u"_hx___neutral", u"_hx___rows", u"_hx___cols", u"_hx___all_icebergs", u"max_turns_without_icepital")
-    _hx_fields = [u"__players", u"__turnTime", u"__turnStartTime", u"__numPlayers", u"__recoverErrors", u"_runnerFullStacktrace", u"max_points", u"max_turns", u"turn", u"__me", u"__enemies", u"__orders", u"__nativeAPI", u"__icepital_holders", u"__neutral", u"__rows", u"__cols", u"__all_icebergs", u"max_turns_without_icepital"]
-    _hx_methods = [u"_nextTurn", u"_shouldRecoverErrors", u"isFilePosInBot", u"_addOrder", u"_addMoveOrder", u"_getActions", u"debug", u"get_myself", u"get_enemy", u"get_all_players", u"get_time_remaining", u"get_max_turn_time", u"get_all_icepital_icebergs", u"get_my_icepital_icebergs", u"get_enemy_icepital_icebergs", u"get_neutral_icepital_icebergs", u"get_neutral", u"get_all_penguin_groups", u"get_my_penguin_groups", u"get_enemy_penguin_groups", u"_moveOrder", u"get_neutral_icebergs", u"get_all_icebergs", u"get_my_icebergs", u"get_enemy_icebergs"]
+    __slots__ = (u"_hx___players", u"_hx___turnTime", u"_hx___turnStartTime", u"_hx___numPlayers", u"_hx___recoverErrors", u"_runnerFullStacktrace", u"max_points", u"max_turns", u"turn", u"_hx___me", u"_hx___enemies", u"_hx___orders", u"_hx___nativeAPI", u"_hx___icepital_holders", u"_hx___neutral", u"_hx___rows", u"_hx___cols", u"_hx___all_icebergs", u"max_turns_without_icepital", u"acceleration_cost", u"acceleration_factor", u"_hx___clonebergs", u"cloneberg_max_pause_turns", u"cloneberg_multi_factor")
+    _hx_fields = [u"__players", u"__turnTime", u"__turnStartTime", u"__numPlayers", u"__recoverErrors", u"_runnerFullStacktrace", u"max_points", u"max_turns", u"turn", u"__me", u"__enemies", u"__orders", u"__nativeAPI", u"__icepital_holders", u"__neutral", u"__rows", u"__cols", u"__all_icebergs", u"max_turns_without_icepital", u"acceleration_cost", u"acceleration_factor", u"__clonebergs", u"cloneberg_max_pause_turns", u"cloneberg_multi_factor"]
+    _hx_methods = [u"_nextTurn", u"_shouldRecoverErrors", u"isFilePosInBot", u"_addOrder", u"_addMoveOrder", u"_getActions", u"debug", u"get_myself", u"get_enemy", u"get_all_players", u"get_time_remaining", u"get_max_turn_time", u"get_all_icepital_icebergs", u"get_my_icepital_icebergs", u"get_enemy_icepital_icebergs", u"get_neutral_icepital_icebergs", u"get_neutral", u"get_all_penguin_groups", u"get_my_penguin_groups", u"get_enemy_penguin_groups", u"_moveOrder", u"get_neutral_icebergs", u"get_all_icebergs", u"get_my_icebergs", u"get_enemy_icebergs", u"get_cloneberg"]
     _hx_statics = [u"__getObjectsOfEnemyPlayers_Iceberg", u"__getObjectsOfPlayer_Iceberg", u"UNKNOWN_ORDER_FILE_NAME", u"UNKNOWN_ORDER_LINE_NUMBER"]
     _hx_interfaces = []
     _hx_super = BaseObject
 
 
     def __init__(self,nativeAPI):
+        self.cloneberg_multi_factor = None
+        self.cloneberg_max_pause_turns = None
+        self._hx___clonebergs = None
+        self.acceleration_factor = None
+        self.acceleration_cost = None
         self.max_turns_without_icepital = None
         self._hx___all_icebergs = None
         self._hx___neutral = None
@@ -1018,6 +1099,16 @@ class Game(BaseObject):
     def get_enemy_icebergs(self):
         return Game._hx___getObjectsOfEnemyPlayers_Iceberg(self._hx___all_icebergs,self._hx___me)
 
+    def get_cloneberg(self):
+        this1 = self._hx___clonebergs
+        this2 = [None]*len(this1)
+        r = this2
+        haxe_ds__Vector_Vector_Impl_.blit(this1,0,r,0,len(this1))
+        Clonebergs = r
+        if (len(Clonebergs) == 0):
+            return None
+        return Clonebergs[0]
+
     @staticmethod
     def _hx___getObjectsOfEnemyPlayers_Iceberg(objects,player):
         results = list()
@@ -1061,14 +1152,19 @@ class Game(BaseObject):
         _hx_o._hx___cols = None
         _hx_o._hx___all_icebergs = None
         _hx_o.max_turns_without_icepital = None
+        _hx_o.acceleration_cost = None
+        _hx_o.acceleration_factor = None
+        _hx_o._hx___clonebergs = None
+        _hx_o.cloneberg_max_pause_turns = None
+        _hx_o.cloneberg_multi_factor = None
 Game._hx_class = Game
 _hx_classes[u"Game"] = Game
 
 
 class Player(BaseObject):
     _hx_class_name = u"Player"
-    __slots__ = (u"id", u"score", u"penguin_groups", u"icebergs", u"does_have_icepital", u"turns_without_icepital")
-    _hx_fields = [u"id", u"score", u"penguin_groups", u"icebergs", u"does_have_icepital", u"turns_without_icepital"]
+    __slots__ = (u"id", u"score", u"penguin_groups", u"icebergs", u"does_have_icepital", u"turns_without_icepital", u"penguin_amount_on_cloneberg")
+    _hx_fields = [u"id", u"score", u"penguin_groups", u"icebergs", u"does_have_icepital", u"turns_without_icepital", u"penguin_amount_on_cloneberg"]
     _hx_methods = [u"equals", u"hashCode", u"toString"]
     _hx_statics = []
     _hx_interfaces = []
@@ -1095,6 +1191,7 @@ class Player(BaseObject):
         _hx_o.icebergs = None
         _hx_o.does_have_icepital = None
         _hx_o.turns_without_icepital = None
+        _hx_o.penguin_amount_on_cloneberg = None
 Player._hx_class = Player
 _hx_classes[u"Player"] = Player
 

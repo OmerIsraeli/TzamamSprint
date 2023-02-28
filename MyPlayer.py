@@ -5,6 +5,7 @@ SPREAD = 0
 DEFEND = 1
 ATTACK = 2
 UPGRADE = 3
+AMOUNT_TO_CLONE = 1
 
 
 class MyPlayer:
@@ -25,23 +26,35 @@ class MyPlayer:
         my_icebergs = self.game.get_my_icebergs()
         for ice in my_icebergs:
             print(ice.upgrade_cost)
-            if ice.can_upgrade() and ice.upgrade_cost <= self.percent * ice.penguin_amount and ice is not in game.get_my_icepital_icebergs():
+            if ice.can_upgrade() and ice.upgrade_cost <= self.percent * ice.penguin_amount and ice not in \
+                    self.game.get_my_icepital_icebergs():
                 ice.upgrade()
                 print(ice, "upgraded to level", ice.level)
+            else:
+                cloneberg = self.game.get_cloneberg()
+                if self.turn_num % self.game.cloneberg_max_pause_turns == 0:
+                    self.send_penguins(AMOUNT_TO_CLONE, ice, cloneberg)
 
     def upgrade_capital(self):
         my_capital = self.game.get_my_icepital_icebergs()[0]
         if my_capital.can_upgrade() and my_capital.upgrade_cost <= self.percent * my_capital.penguin_amount:
             my_capital.upgrade()
             print(my_capital, "upgraded to level", my_capital.level)
+        else:
+            cloneberg = self.game.get_cloneberg()
+            if self.turn_num % self.game.cloneberg_max_pause_turns == 0:
+                self.send_penguins(AMOUNT_TO_CLONE, my_capital, cloneberg)
 
     def attack(self, list_of_attackers):
         for attacker in list_of_attackers:
             if attacker not in self.game.get_my_icepital_icebergs():
-                attacker.send_penguins(self.game.get_enemy_icepital_icebergs()[0], attacker.penguin_anount - 1)
+                attacker.send_penguins(self.game.get_enemy_icepital_icebergs()[0], attacker.penguin_anount)
+                print(attacker, "sends", (attacker.penguin_anount), "penguins to",
+                      self.game.get_enemy_icepital_icebergs()[0])
             else:
                 attacker.send_penguins(self.game.get_enemy_icepital_icebergs()[0], attacker.penguin_anount // 2)
-        print(my_iceberg, "sends", (dest_penguin_amount + 1), "penguins to", dest)
+                print(attacker, "sends", (attacker.penguin_anount // 2), "penguins to",
+                      self.game.get_enemy_icepital_icebergs()[0])
 
     def defend(self):
         my_icegergs = self.game.get_my_icebergs()
@@ -88,7 +101,7 @@ class MyPlayer:
                 self.attack(list_of_attackers)
             # If I do not attack, I want to Land & Expand with the icebregs
             else:
-                if 2 * game.get_my_icebergs() > game.get_all_icebergs():
+                if 2 * self.game.get_my_icebergs() > self.game.get_all_icebergs():
                     print("Upgrade Mode")
                     self.upgrade_icebergs()
                 else:
