@@ -19,22 +19,29 @@ class MyPlayer:
         self.game = game
 
     def do_turn(self):
-        self.funcs[self.determine_state()]()
+        self.determine_state()
 
-    def upgrade(self):
+    def upgrade_icebergs(self):
         my_icebergs = self.game.get_my_icebergs()
         for ice in my_icebergs:
             print(ice.upgrade_cost)
-            if ice.can_upgrade() and ice.upgrade_cost <= self.percent * ice.penguin_amount:
+            if ice.can_upgrade() and ice.upgrade_cost <= self.percent * ice.penguin_amount and ice is not in game.get_my_icepital_icebergs():
                 ice.upgrade()
+                print(ice, "upgraded to level", ice.level)
 
-    def attack(self):
-        my_icegergs = self.game.get_my_icebergs()
-        destination = self.game.get_enemy_icepital_icebergs()[0]
-        for iceberg in my_icegergs:
-            if destination:
-                print(iceberg, "sends", (iceberg.penguin_amount), "penguins to", destination)
-                iceberg.send_penguins(destination, iceberg.penguin_amount)
+    def upgrade_capital(self):
+        my_capital = self.game.get_my_icepital_icebergs()[0]
+        if my_capital.can_upgrade() and my_capital.upgrade_cost <= self.percent * my_capital.penguin_amount:
+            my_capital.upgrade()
+            print(my_capital, "upgraded to level", my_capital.level)
+    def attack(self,list_of_attackers):
+        for attacker in list_of_attackers:
+            if attacker not in self.game.get_my_icepital_icebergs():
+                attacker.send_penguins(self.game.get_enemy_icepital_icebergs()[0], attacker.penguin_anount - 1)
+            else:
+                attacker.send_penguins(self.game.get_enemy_icepital_icebergs()[0], attacker.penguin_anount // 2)
+        print(my_iceberg, "sends", (dest_penguin_amount + 1), "penguins to", dest)
+
 
     def defend(self):
         my_icegergs = self.game.get_my_icebergs()
@@ -68,20 +75,24 @@ class MyPlayer:
         # If I want to spread
         print(self.turn_num)
         self.turn_num += 1
+        #Initial play -  here we want to spread quicly
         if len(self.game.get_my_icebergs()) < 3:
-            return SPREAD
+            print("Initial Spreading")
+            self.initial_spread()
+        else:
 
-        # Here I check if I want to attack
-        max_dist = 0
-        num_of_ping_to_send = 0
-        my_iceberg_list = self.game.get_my_icebergs()
-        enemy_icepital = self.game.get_enemy_icepital_icebergs()[0]
-        for iceberg in my_iceberg_list:
-            dist = iceberg.get_turns_till_arrival(enemy_icepital)
-            max_dist = max(max_dist, dist)
-            num_of_ping_to_send += iceberg.penguin_amount - 1
-
-        if num_of_ping_to_send > max_dist + enemy_icepital.penguin_amount:
-            return ATTACK
-        return UPGRADE
+            # Here I check if I want to attack
+            list_of_attackers = self.should_I_attack()
+            if list_of_attackers:
+                print("All In Attack")
+                self.attack(list_of_attackers)
+            #If I do not attack, I want to Land & Expand with the icebregs
+            else:
+                if 2 * game.get_my_icebergs() > game.get_all_icebergs():
+                    print("Upgrade Mode")
+                    self.upgrade_icebergs()
+                else:
+                    print("Land & Exapnd")
+                    self.spread()
+                self.upgrade_capital()
 
