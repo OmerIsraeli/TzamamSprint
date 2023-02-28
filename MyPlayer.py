@@ -77,8 +77,8 @@ class MyPlayer:
         # Here I check if I want to attack
         max_dist = 0
         num_of_ping_to_send = 0
-        my_iceberg_list : List[Iceberg] = game.get_my_icebergs()
-        enemy_icepital : Iceberg = game.get_enemy_icepital_icebergs()[0]
+        my_iceberg_list : List[Iceberg] = self.game.get_my_icebergs()
+        enemy_icepital : Iceberg = self.game.get_enemy_icepital_icebergs()[0]
         for iceberg in my_iceberg_list:
             dist = iceberg.get_turns_till_arrival(enemy_icepital)
             max_dist = max(max_dist,dist)

@@ -6,7 +6,6 @@ from MyPlayer import MyPlayer
 from Utils import *
 
 
-
 def do_turn(game):
     """
     Makes the bot run a single turn.
@@ -17,4 +16,3 @@ def do_turn(game):
 
     player = MyPlayer(game)
     player.do_turn()
-
