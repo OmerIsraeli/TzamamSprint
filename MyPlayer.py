@@ -181,6 +181,13 @@ class MyPlayer:
                 count += group.penguin_amount
         return count
 
+    def is_under_attack(self, dst):
+        count = 0
+        for group in self.game.get_enemy_penguin_groups():
+            if group.destination.equals(dst):
+                count += group.penguin_amount
+        return count
+
     def send_penguins(self, amount, src, dst):
         print(src, "sends", amount, "penguins to", dst)
         src.send_penguins(dst, amount)
