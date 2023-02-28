@@ -33,8 +33,16 @@ def spread():
 def upgrade():
     pass
 
-def attack():
-    pass
+def attack(game: Game):
+    my_icegergs = game.get_my_icebergs()
+    destination = game.get_enemy_icepital_icebergs()
+    for iceberg in my_icegergs:
+        if destination:
+            print(iceberg, "sends", (iceberg.penguin_amount), "penguins to", destination)
+            iceberg.send_penguins(destination, iceberg.penguin_amount)
+
+
+
 
 def defend():
     pass
@@ -52,7 +60,7 @@ def defend():
     #     else:
     #         # Target an enemy iceberg.
     #         destination = game.get_enemy_icebergs()[0]  # type: Iceberg
-    #         destination.
+    #         destination
     #
     #     # The amount of penguins the target has.
     #     destination_penguin_amount = destination.penguin_amount  # type: int
