@@ -8,6 +8,7 @@ ATTACK = 2
 UPGRADE = 3
 funcs = {SPREAD: spread, DEFEND: defend, ATTACK: attack, UPGRADE: upgrade}
 
+
 class MyPlayer:
     _instance = None
 
@@ -16,7 +17,9 @@ class MyPlayer:
             cls._instance = object.__new__(cls)
         return cls._instance
 
-
+    def __init__(self) -> None:
+        super().__init__()
+        self.turn_num = 0
 
     def upgrade(self, game: Game):
         pass
