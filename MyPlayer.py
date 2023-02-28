@@ -13,7 +13,7 @@ WAIT_MIN = 5
 class MyPlayer:
     def __init__(self):
         self.turn_num = 0
-        self.percent = 0.2
+        self.percent = 0.9
         self.game = None
 
     def set_game(self, game):
@@ -82,29 +82,27 @@ class MyPlayer:
             if self.on_the_way(dest) == 0:
                 chosen_destinations.append(dest)
         chosen_dest = sorted(chosen_destinations,
-                                 key=lambda dest_iceberg: dest_iceberg.penguin_amount())[:1]
+                             key=lambda dest_iceberg: dest_iceberg.penguin_amount)[0]
         dest_penguin_amount = chosen_dest.penguin_amount
         my_iceberg_list = self.game.get_my_icebergs()
+        my_iceberg_list.remove(self.game.get_my_icepital_icebergs()[0])
         sum = 0
         for iceberg in my_iceberg_list:
             sum += iceberg.penguin_amount - 1
         if sum >= dest_penguin_amount + 1:
             for iceberg in my_iceberg_list:
-                iceberg.send_penguins(chosen_dest, math.ceil(iceberg.penguin_amount - 1))
-
+                iceberg.send_penguins(chosen_dest, iceberg.penguin_amount - 1)
 
     def spread_to_enemy(self):
         pass
 
-
     def spread(self):
         if self.game.get_neutral_icebergs():
+            print("spread_to_neutral")
             self.spread_to_neutral()
         else:
             print("spread to enemy")
             self.spread_to_enemy()
-
-
 
     def determine_state(self):
         """
@@ -128,15 +126,15 @@ class MyPlayer:
                 if list_of_attackers:
                     print("All In Attack")
                     self.attack(list_of_attackers)
-            # If I do not attack, I want to Land & Expand with the icebregs
-            else:
-                if 2 * len(self.game.get_my_icebergs()) > len(self.game.get_all_icebergs()):
-                    print("Upgrade Mode")
-                    self.upgrade_icebergs()
+                # If I do not attack, I want to Land & Expand with the icebregs
                 else:
-                    print("Land & Exapnd")
-                    self.spread()
-                self.upgrade_capital()
+                    if 2 * len(self.game.get_my_icebergs()) > len(self.game.get_all_icebergs()):
+                        print("Upgrade Mode")
+                        self.upgrade_icebergs()
+                    else:
+                        print("Land & Exapnd")
+                        self.spread()
+                    self.upgrade_capital()
 
     def should_I_attack(self, dst):
         """
