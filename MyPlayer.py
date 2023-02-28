@@ -76,31 +76,35 @@ class MyPlayer:
                     if self.on_the_way(dest) == 0:
                         self.send_penguins(dest.penguin_amount + 1, my_iceberg, dest)
 
-    def optional_dest(self):
+    def spread_to_neutral(self):
         chosen_destinations = []
-        if self.game.get_neutral_icebergs():
-            for dest in self.game.get_neutral_icebergs():
-                if self.on_the_way(dest) == 0:
-                    chosen_destinations.append(dest)
-        else:
-            for dest in self.game.get_enemy_icepital_icebergs():
-                if not self.on_the_way(dest):
-                    chosen_destinations.append(dest)
-        return chosen_destinations
+        for dest in self.game.get_neutral_icebergs():
+            if self.on_the_way(dest) == 0:
+                chosen_destinations.append(dest)
+        chosen_dest = sorted(chosen_destinations,
+                                 key=lambda dest_iceberg: dest_iceberg.penguin_amount())[:1]
+        dest_penguin_amount = chosen_dest.penguin_amount
+        my_iceberg_list = self.game.get_my_icebergs()
+        sum = 0
+        for iceberg in my_iceberg_list:
+            sum += iceberg.penguin_amount - 1
+        if sum >= dest_penguin_amount + 1:
+            for iceberg in my_iceberg_list:
+                iceberg.send_penguins(chosen_dest, math.ceil(iceberg.penguin_amount - 1))
+
+
+    def spread_to_enemy(self):
+        pass
+
 
     def spread(self):
-        for icepital in self.game.get_my_icepital_icebergs():
-            spread_destinations = self.optional_dest()
-            chosen_dest = sorted(spread_destinations,
-                                 key=lambda dest_iceberg: icepital.get_turns_till_arrival(dest_iceberg))[:1]
-            my_iceberg_list = self.game.get_my_icebergs()
-            dest_penguin_amount = chosen_dest[0].penguin_amount
-            sum = 0
-            for iceberg in my_iceberg_list:
-                sum += iceberg.penguin_amount
-            if sum > dest_penguin_amount:
-                for iceberg in my_iceberg_list:
-                    iceberg.send_penguins(chosen_dest, math.ceil(iceberg.penguin_amount * 0.5))
+        if self.game.get_neutral_icebergs():
+            self.spread_to_neutral()
+        else:
+            print("spread to enemy")
+            self.spread_to_enemy()
+
+
 
     def determine_state(self):
         """
