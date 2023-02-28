@@ -174,6 +174,23 @@ class MyPlayer:
                 if total > strength:
                     return my_icebergs[:i + 1]
 
+
+    def defend(self, under_attack):
+        attackers = self.is_under_attack(under_attack)
+        my_icebergs = self.game.get_my_icebergs()
+        my_icebergs.remove(self.game.get_my_icepital_icebergs()[0])
+        sum = 0
+        max_time = 0
+        for ice in my_icebergs:
+            sum += ice.penguin_amount
+            max_time = max(ice.get_turns_till_arrival(under_attack), max_time)
+        Y = attackers - (under_attack.penguin_amount + under_attack.penguins_per_turn * max_time + self.on_the_way(under_attack))
+        x = max(Y, 0)
+
+        for i, iceberg in enumerate(my_icebergs):
+            amount_to_send = (x * iceberg.penguin_amount) / sum
+            self.send_penguins(amount_to_send, iceberg, under_attack)
+
     def on_the_way(self, dst):
         count = 0
         for group in self.game.get_my_penguin_groups():
