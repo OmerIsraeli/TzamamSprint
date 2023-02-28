@@ -25,8 +25,11 @@ class MyPlayer:
     def do_turn(self):
         funcs[self.determine_state()]()
 
-    def upgrade(self, game: Game):
-        pass
+    def upgrade(self, game: Game, precent: Int):
+        my_icebergs: [Iceberg] = game.get_my_icebergs()
+        for ice in my_icebergs:
+            if ice.can_upgrade() and ice.upgrade_cost() <= precent * ice.penguin_amount:
+                ice.upgrade()
 
     def attack(game: Game):
         my_icegergs = game.get_my_icebergs()
@@ -48,14 +51,12 @@ class MyPlayer:
         # If there are any neutral icebergs.
         for my_iceberg in game.get_my_icepital_icebergs():
             if game.get_neutral_icebergs():
-                # Target a neutral iceberg.
                 spread_destinations = game.get_neutral_icebergs()  # type: List
-                for dest in spread_destinations:
-                    my_iceberg.get_turns_till_arrival(dest)
-
+                spread_destinations = sorted(spread_destinations, key=lambda x: my_iceberg.get_turns_till_arrival(x),
+                                             reverse=True)[:3]
                 for dest in spread_destinations:
                     destination_penguin_amount = dest.penguin_amount  # type: int
-                    # print(my_iceberg, "sends", (destination_penguin_amount + 1), "penguins to", dest)
+                    print(my_iceberg, "sends", (destination_penguin_amount + 1), "penguins to", dest)
                     my_iceberg.send_penguins(dest, destination_penguin_amount + 1)
 
     def determine_state(self):
