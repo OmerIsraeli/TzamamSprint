@@ -6,14 +6,14 @@ SPREAD = 0
 DEFEND = 1
 ATTACK = 2
 UPGRADE = 3
-AMOUNT_TO_CLONE = 2
+AMOUNT_TO_CLONE = 1
 WAIT_MIN = 5
 
 
 class MyPlayer:
     def __init__(self):
         self.turn_num = 0
-        self.percent = 0.9
+        self.percent = 0.6
         self.game = None
 
     def set_game(self, game):
@@ -36,8 +36,8 @@ class MyPlayer:
 
     def upgrade_capital(self):
         my_capital = self.game.get_my_icepital_icebergs()[0]
-        print("COST OF upgrade:", my_capital.upgrade_cost)
-        if my_capital.can_upgrade():
+        print("COST OF upgrade:", my_capital.upgrade_cost, "min:", self.percent * my_capital.penguin_amount)
+        if my_capital.can_upgrade() and my_capital.upgrade_cost < self.percent * my_capital.penguin_amount:
             my_capital.upgrade()
             print(my_capital, "upgraded to level", my_capital.level)
         else:
@@ -109,9 +109,9 @@ class MyPlayer:
             if self.on_the_way(dest) == 0:
                 chosen_destinations.append(dest)
             attackers = self.should_I_attack(dest, False)
+            if(attackers):
+                self.attack_dst(attackers, dest)
 
-            chosen_dest = sorted(chosen_destinations,
-                                 key=lambda dest_iceberg: dest_iceberg.penguin_amount)[0]
 
     def spread(self):
         if self.game.get_enemy_icebergs():
@@ -145,12 +145,9 @@ class MyPlayer:
                     self.attack(list_of_attackers)
                 # If I do not attack, I want to Land & Expand with the icebregs
                 else:
-                    if 2 * len(self.game.get_my_icebergs()) > len(self.game.get_all_icebergs()):
-                        print("Upgrade Mode")
-                        self.upgrade_icebergs()
-                    else:
-                        print("Land & Exapnd")
-                        self.spread()
+                    print("Spreading or Upgrading")
+                    self.spread()
+                    self.upgrade_icebergs()
                     self.upgrade_capital()
 
     def should_I_attack(self, dst, all_in=True):
@@ -173,7 +170,7 @@ class MyPlayer:
                 else:
                     total += iceberg.penguin_amount
                 strength = other_capital.penguin_amount + other_capital.penguins_per_turn * iceberg.get_turns_till_arrival(
-                    other_capital) + 10
+                    other_capital) + 20
                 if total > strength:
                     return my_icebergs[:i + 1]
 
