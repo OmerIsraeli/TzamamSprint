@@ -8,11 +8,11 @@ UPGRADE = 3
 
 
 class MyPlayer:
-
     def __init__(self):
         self.turn_num = 0
         self.percent = 0.2
         self.game = None
+        self.on_the_way = dict()
         self.funcs = {SPREAD: self.spread, DEFEND: self.defend, ATTACK: self.attack, UPGRADE: self.upgrade}
 
     def set_game(self, game):
@@ -85,3 +85,29 @@ class MyPlayer:
             return ATTACK
         return UPGRADE
 
+    def should_I_attack(self):
+        """
+        check weather attacking now will win
+        :return: combination of icbergs from which to attack
+        """
+        my_icebergs = self.game.get_my_icebergs()
+        other_capital: Iceberg = self.game.get_enemy_icepital_icebergs()[0]
+        my_icebergs = sorted(my_icebergs, key=lambda iceberg: iceberg.get_turns_till_arrival(other_capital))
+        total = 0
+        for iceberg, i in enumerate(my_icebergs):
+            total += iceberg.penguin_amount
+            strength = other_capital.penguin_amount + other_capital.penguins_per_turn * my_icebergs.get_turns_till_arrival(
+                other_capital)
+            if total > strength:
+                return my_icebergs[:i]
+
+    def on_the_way(self, dst):
+        count = 0
+        for group in self.game.get_my_penguin_groups():
+            if group.destination.equals(dst):
+                count += group.penguin_amount
+        return count
+
+    def send_penguins(self, amount, src, dst):
+        print(src, "sends", amount, "penguins to", dst)
+        src.send_penguins(dst, amount)
