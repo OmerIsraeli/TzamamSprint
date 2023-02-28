@@ -11,11 +11,14 @@ WAIT_MIN = 5
 ALL_IN_ADDITION = 20
 ATTACK_FACTOR = 0.7
 INITIAL_CONST = 3
+CLONE_FACTOR = 0.75
+RECEIVE_FROM_CLONE = 1
 
 
 class MyPlayer:
     def __init__(self):
         self.turn_num = 0
+        self.stage = 0
         self.percent = 0.75
         self.game = None
         self.my_capital = None
@@ -23,8 +26,8 @@ class MyPlayer:
 
     def set_game(self, game):
         self.game = game
-        self.my_capital = game.get_my_icepital_icebergs()[0]
-        self.enemy_capital = game.get_enemy_icepital_icebergs()[0]
+        self.my_capital = self.game.get_my_icepital_icebergs()[0]
+        self.enemy_capital = self.game.get_enemy_icepital_icebergs()[0]
 
     def do_turn(self):
         self.determine_state()
@@ -39,6 +42,8 @@ class MyPlayer:
         # At the beginning we spread to 3 icebergs
 
         print(self.turn_num)
+        icebergs = self.game.get_all_icebergs()
+        icebergs.remove(self.enemy_capital)
         self.turn_num += 1
         if self.turn_num == 1:
           if self.my_capital.can_send_penguins_to_set_siege(self.enemy_capital,self.my_capital.penguin - 1):
@@ -50,8 +55,14 @@ class MyPlayer:
             my_capital = self.game.get_my_icepital_icebergs()[0]
             print(my_capital.upgrade_cost)
             my_capital.upgrade()
+        clone = self.game.get_cloneberg()
+        if self.stage == 2:
+            if clone and self.my_capital.penguin_amount > 10:
+                minimal_to_clone = min(icebergs, key=lambda iceberg: iceberg.get_turns_till_arrival(clone))
+                self.send_penguins(self.my_capital.penguin_amount, self.my_capital, minimal_to_clone)
         # Initial play -  here we want to spread quicly
         else:
+            self.handle_clone(clone, icebergs)
             if (len(self.game.get_my_icebergs()) + self.we_are_attacking()) < INITIAL_CONST + 1:
                 print("Initial Spreading")
                 self.initial_spread()
@@ -72,6 +83,13 @@ class MyPlayer:
                         self.upgrade_icebergs()
                         if not self.is_under_attack(self.game.get_my_icepital_icebergs()[0]):
                             self.upgrade_capital()
+
+    def handle_clone(self, clone, icebergs):
+        if clone:
+            minimal_to_clone = min(icebergs, key=lambda iceberg: iceberg.get_turns_till_arrival(clone))
+            self.send_penguins(minimal_to_clone.penguin_amount * CLONE_FACTOR, minimal_to_clone, clone)
+            for berg in self.game.get_my_icebergs():
+                self.send_penguins(RECEIVE_FROM_CLONE, minimal_to_clone, berg)
 
     def upgrade_icebergs(self):
         my_icebergs = self.game.get_my_icebergs()
