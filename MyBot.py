@@ -35,17 +35,20 @@ def upgrade():
 
 def attack(game: Game):
     my_icegergs = game.get_my_icebergs()
-    destination = game.get_enemy_icepital_icebergs()
+    destination = game.get_enemy_icepital_icebergs()[0]
     for iceberg in my_icegergs:
         if destination:
             print(iceberg, "sends", (iceberg.penguin_amount), "penguins to", destination)
             iceberg.send_penguins(destination, iceberg.penguin_amount)
 
 
-
-
-def defend():
-    pass
+def defend(game: Game):
+    my_icegergs = game.get_my_icebergs()
+    destination: Iceberg = game.get_my_icepital_icebergs()[0]
+    for iceberg in my_icegergs:
+        if destination:
+            print(iceberg, "sends", (iceberg.penguin_amount), "penguins to", destination)
+            iceberg.send_penguins(destination, iceberg.penguin_amount)
 
 
     # # Go over all of my icepitals and conquer icebergs
