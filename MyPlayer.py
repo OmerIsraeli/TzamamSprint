@@ -6,7 +6,7 @@ SPREAD = 0
 DEFEND = 1
 ATTACK = 2
 UPGRADE = 3
-AMOUNT_TO_CLONE = 1
+AMOUNT_TO_CLONE = 2
 WAIT_MIN = 5
 
 
@@ -26,8 +26,7 @@ class MyPlayer:
         my_icebergs = self.game.get_my_icebergs()
         for ice in my_icebergs:
             print(ice.upgrade_cost)
-            if ice.can_upgrade() and ice.upgrade_cost <= self.percent * ice.penguin_amount and ice not in \
-                    self.game.get_my_icepital_icebergs():
+            if ice.can_upgrade() and ice not in self.game.get_my_icepital_icebergs():
                 ice.upgrade()
                 print(ice, "upgraded to level", ice.level)
             else:
@@ -37,7 +36,8 @@ class MyPlayer:
 
     def upgrade_capital(self):
         my_capital = self.game.get_my_icepital_icebergs()[0]
-        if my_capital.can_upgrade() and my_capital.upgrade_cost <= self.percent * my_capital.penguin_amount:
+        print("COST OF upgrade:", my_capital.upgrade_cost)
+        if my_capital.can_upgrade():
             my_capital.upgrade()
             print(my_capital, "upgraded to level", my_capital.level)
         else:
