@@ -45,16 +45,26 @@ class MyPlayer:
             if self.turn_num % max(WAIT_MIN, self.game.cloneberg_max_pause_turns) == 0:
                 self.send_penguins(AMOUNT_TO_CLONE, my_capital, cloneberg)
 
-    def attack(self, list_of_attackers):
+    def attack_dst(self, list_of_attackers, dst):
         for attacker in list_of_attackers:
             if attacker not in self.game.get_my_icepital_icebergs():
-                attacker.send_penguins(self.game.get_enemy_icepital_icebergs()[0], attacker.penguin_amount)
-                print(attacker, "sends", (attacker.penguin_amount), "penguins to",
-                      self.game.get_enemy_icepital_icebergs()[0])
+                attacker.send_penguins(dst, attacker.penguin_amount)
+                print(attacker, "sends", (attacker.penguin_amount), "penguins to", dst)
             else:
-                attacker.send_penguins(self.game.get_enemy_icepital_icebergs()[0], attacker.penguin_amount // 2)
-                print(attacker, "sends", (attacker.penguin_amount // 2), "penguins to",
-                      self.game.get_enemy_icepital_icebergs()[0])
+                attacker.send_penguins(dst, attacker.penguin_amount // 2)
+                print(attacker, "sends", (attacker.penguin_amount // 2), "penguins to", dst)
+
+    def attack(self, list_of_attackers):
+        self.attack_dst(self.game.get_enemy_icepital_icebergs()[0])
+        # for attacker in list_of_attackers:
+        #     if attacker not in self.game.get_my_icepital_icebergs():
+        #         attacker.send_penguins(self.game.get_enemy_icepital_icebergs()[0], attacker.penguin_amount)
+        #         print(attacker, "sends", (attacker.penguin_amount), "penguins to",
+        #               self.game.get_enemy_icepital_icebergs()[0])
+        #     else:
+        #         attacker.send_penguins(self.game.get_enemy_icepital_icebergs()[0], attacker.penguin_amount // 2)
+        #         print(attacker, "sends", (attacker.penguin_amount // 2), "penguins to",
+        #               self.game.get_enemy_icepital_icebergs()[0])
 
     def defend(self):
         my_icegergs = self.game.get_my_icebergs()
@@ -94,15 +104,22 @@ class MyPlayer:
                 iceberg.send_penguins(chosen_dest, iceberg.penguin_amount - 1)
 
     def spread_to_enemy(self):
-        pass
+        chosen_destinations = []
+        for dest in self.game.get_enemy_icebergs():
+            if self.on_the_way(dest) == 0:
+                chosen_destinations.append(dest)
+            attackers = self.should_I_attack(dest, False)
+
+            chosen_dest = sorted(chosen_destinations,
+                                 key=lambda dest_iceberg: dest_iceberg.penguin_amount)[0]
 
     def spread(self):
-        if self.game.get_neutral_icebergs():
-            print("spread_to_neutral")
-            self.spread_to_neutral()
-        else:
+        if self.game.get_enemy_icebergs():
             print("spread to enemy")
             self.spread_to_enemy()
+        else:
+            print("spread_to_neutral")
+            self.spread_to_neutral()
 
     def determine_state(self):
         """
@@ -136,7 +153,7 @@ class MyPlayer:
                         self.spread()
                     self.upgrade_capital()
 
-    def should_I_attack(self, dst):
+    def should_I_attack(self, dst, all_in=True):
         """
         check weather attacking now will win
         :return: combination of icbergs from which to attack
@@ -145,9 +162,16 @@ class MyPlayer:
             my_icebergs = self.game.get_my_icebergs()
             other_capital = dst
             my_icebergs = sorted(my_icebergs, key=lambda iceberg: iceberg.get_turns_till_arrival(other_capital))
+            if not all_in:
+                my_icebergs.remove(self.game.get_my_icepital_icebergs()[0])
             total = 0
             for i, iceberg in enumerate(my_icebergs):
-                total += iceberg.penguin_amount
+                if iceberg == self.game.get_my_icepital_icebergs()[0]:
+                    total += iceberg.penguin_amount // 2
+                elif not all_in:
+                    total += iceberg.penguin_amount // 2
+                else:
+                    total += iceberg.penguin_amount
                 strength = other_capital.penguin_amount + other_capital.penguins_per_turn * iceberg.get_turns_till_arrival(
                     other_capital) + 10
                 if total > strength:
