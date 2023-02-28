@@ -20,51 +20,52 @@ class MyPlayer:
     def __init__(self, game: Game) -> None:
         super().__init__()
         self.turn_num: int = 0
+        self.percent: int = 0.5
         self.game: Game = game
 
     def do_turn(self):
         funcs[self.determine_state()]()
 
-    def upgrade(self, game: Game, precent: Int):
-        my_icebergs: [Iceberg] = game.get_my_icebergs()
+    def upgrade(self):
+        my_icebergs: [Iceberg] = self.game.get_my_icebergs()
         for ice in my_icebergs:
-            if ice.can_upgrade() and ice.upgrade_cost() <= precent * ice.penguin_amount:
+            if ice.can_upgrade() and ice.upgrade_cost() <= self.percent * ice.penguin_amount:
                 ice.upgrade()
 
-    def attack(game: Game):
-        my_icegergs = game.get_my_icebergs()
-        destination = game.get_enemy_icepital_icebergs()[0]
+    def attack(self):
+        my_icegergs = self.game.get_my_icebergs()
+        destination = self.game.get_enemy_icepital_icebergs()[0]
         for iceberg in my_icegergs:
             if destination:
                 print(iceberg, "sends", (iceberg.penguin_amount), "penguins to", destination)
                 iceberg.send_penguins(destination, iceberg.penguin_amount)
 
-    def defend(self, game: Game):
-        my_icegergs = game.get_my_icebergs()
-        destination: Iceberg = game.get_my_icepital_icebergs()[0]
+    def defend(self):
+        my_icegergs = self.game.get_my_icebergs()
+        destination: Iceberg = self.game.get_my_icepital_icebergs()[0]
         for iceberg in my_icegergs:
             if destination:
                 print(iceberg, "sends", (iceberg.penguin_amount), "penguins to", destination)
                 iceberg.send_penguins(destination, iceberg.penguin_amount)
 
-    def spread(self, game: Game):
+    def spread(self):
         # If there are any neutral icebergs.
-        for my_iceberg in game.get_my_icepital_icebergs():
-            if game.get_neutral_icebergs():
-                spread_destinations = game.get_neutral_icebergs()  # type: List
-                spread_destinations = sorted(spread_destinations, key=lambda x: my_iceberg.get_turns_till_arrival(x),
+        for my_iceberg in self.game.get_my_icepital_icebergs():
+            if self.game.get_neutral_icebergs():
+                spread_destinations = self.game.get_neutral_icebergs()  # type: List
+                spread_destinations = sorted(spread_destinations,
+                                             key=lambda dest_iceberg: my_iceberg.get_turns_till_arrival(dest_iceberg),
                                              reverse=True)[:3]
                 for dest in spread_destinations:
-                    destination_penguin_amount = dest.penguin_amount  # type: int
-                    print(my_iceberg, "sends", (destination_penguin_amount + 1), "penguins to", dest)
-                    my_iceberg.send_penguins(dest, destination_penguin_amount + 1)
+                    print(my_iceberg, "sends", (1), "penguins to", dest)
+                    my_iceberg.send_penguins(dest, 1)
 
     def determine_state(self):
         """
            Makes decisions of the states.
 
-           :param game: the current game state.
-           :type game: Game
+           :param self: the current game state.
+           :type self: MyPlayer
         """
         # If I want to spread
         if self.turn_num == 0:
