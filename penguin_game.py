@@ -306,13 +306,49 @@ _hx_classes[u"EReg"] = EReg
 
 class Iceberg(IceBuilding):
     _hx_class_name = u"Iceberg"
-    __slots__ = (u"is_icepital", u"upgrade_value", u"upgrade_cost", u"level", u"upgrade_level_limit", u"cost_factor", u"_hx___can_upgrade_object", u"penguins_per_turn")
-    _hx_fields = [u"is_icepital", u"upgrade_value", u"upgrade_cost", u"level", u"upgrade_level_limit", u"cost_factor", u"__can_upgrade_object", u"penguins_per_turn"]
-    _hx_methods = [u"can_upgrade", u"upgrade"]
+    __slots__ = (u"is_icepital", u"is_under_siege", u"siege_turns", u"siege_begin_turn", u"upgrade_value", u"upgrade_cost", u"level", u"upgrade_level_limit", u"cost_factor", u"_hx___can_upgrade_object", u"penguins_per_turn")
+    _hx_fields = [u"is_icepital", u"is_under_siege", u"siege_turns", u"siege_begin_turn", u"upgrade_value", u"upgrade_cost", u"level", u"upgrade_level_limit", u"cost_factor", u"__can_upgrade_object", u"penguins_per_turn"]
+    _hx_methods = [u"can_send_penguins_to_set_siege", u"send_penguins_to_set_siege", u"can_upgrade", u"upgrade"]
     _hx_statics = []
     _hx_interfaces = []
     _hx_super = IceBuilding
 
+
+    def __init__(self):
+        self.penguins_per_turn = None
+        self._hx___can_upgrade_object = None
+        self.cost_factor = None
+        self.upgrade_level_limit = None
+        self.level = None
+        self.upgrade_cost = None
+        self.upgrade_value = None
+        self.siege_turns = None
+        self.is_under_siege = None
+        self.is_icepital = None
+        self.siege_begin_turn = 0
+
+    def can_send_penguins_to_set_siege(self,destination,penguinAmount):
+        if (not Std._hx_is(destination,Iceberg)):
+            return False
+        if (((penguinAmount > self.penguin_amount) or ((self.penguin_amount < 1))) or (((destination == self) and ((penguinAmount < 1))))):
+            return False
+        if ((destination.owner.id == -1) or ((destination.owner.id == self.owner.id))):
+            return False
+        if ((destination.siege_begin_turn != 0) and (((BaseObject._game.turn - destination.siege_begin_turn) < BaseObject._game.siege_max_turns))):
+            return False
+        return True
+
+    def send_penguins_to_set_siege(self,destination,penguinAmount):
+        if (not Std._hx_is(destination,Iceberg)):
+            print u"The destination is not a Iceberg!, Check your parameters"
+            return
+        if (penguinAmount <= self.penguin_amount):
+            _hx_local_0 = self
+            _hx_local_1 = _hx_local_0.penguin_amount
+            _hx_local_0.penguin_amount = (_hx_local_1 - penguinAmount)
+            _hx_local_0.penguin_amount
+        orderArgs = (((u"\"destination\": " + Std.string(destination.unique_id)) + u", \"penguin_amount\": ") + Std.string(penguinAmount))
+        BaseObject._game._addOrder(u"send_penguins_to_set_siege",self,orderArgs)
 
     def can_upgrade(self):
         return self._hx___can_upgrade_object
@@ -323,6 +359,9 @@ class Iceberg(IceBuilding):
     @staticmethod
     def _hx_empty_init(_hx_o):
         _hx_o.is_icepital = None
+        _hx_o.is_under_siege = None
+        _hx_o.siege_turns = None
+        _hx_o.siege_begin_turn = None
         _hx_o.upgrade_value = None
         _hx_o.upgrade_cost = None
         _hx_o.level = None
@@ -895,8 +934,8 @@ _hx_classes[u"ObjectParser"] = ObjectParser
 
 class PenguinGroup(GameObject):
     _hx_class_name = u"PenguinGroup"
-    __slots__ = (u"source", u"destination", u"penguin_amount", u"turns_till_arrival", u"current_speed", u"cloneberg_pause_turns")
-    _hx_fields = [u"source", u"destination", u"penguin_amount", u"turns_till_arrival", u"current_speed", u"cloneberg_pause_turns"]
+    __slots__ = (u"source", u"destination", u"penguin_amount", u"turns_till_arrival", u"current_speed", u"cloneberg_pause_turns", u"is_siege_group")
+    _hx_fields = [u"source", u"destination", u"penguin_amount", u"turns_till_arrival", u"current_speed", u"cloneberg_pause_turns", u"is_siege_group"]
     _hx_methods = [u"accelerate"]
     _hx_statics = []
     _hx_interfaces = []
@@ -904,7 +943,7 @@ class PenguinGroup(GameObject):
 
 
     def accelerate(self):
-        BaseObject._game._addOrder(u"accelerate_penguin_group",self)
+        BaseObject._game._addOrder(u"accelerate_siege_penguin_group",self)
 
     @staticmethod
     def _hx_empty_init(_hx_o):
@@ -914,21 +953,25 @@ class PenguinGroup(GameObject):
         _hx_o.turns_till_arrival = None
         _hx_o.current_speed = None
         _hx_o.cloneberg_pause_turns = None
+        _hx_o.is_siege_group = None
 PenguinGroup._hx_class = PenguinGroup
 _hx_classes[u"PenguinGroup"] = PenguinGroup
 
 
 class Game(BaseObject):
     _hx_class_name = u"Game"
-    __slots__ = (u"_hx___players", u"_hx___turnTime", u"_hx___turnStartTime", u"_hx___numPlayers", u"_hx___recoverErrors", u"_runnerFullStacktrace", u"max_points", u"max_turns", u"turn", u"_hx___me", u"_hx___enemies", u"_hx___orders", u"_hx___nativeAPI", u"_hx___icepital_holders", u"_hx___neutral", u"_hx___rows", u"_hx___cols", u"_hx___all_icebergs", u"max_turns_without_icepital", u"acceleration_cost", u"acceleration_factor", u"_hx___clonebergs", u"cloneberg_max_pause_turns", u"cloneberg_multi_factor")
-    _hx_fields = [u"__players", u"__turnTime", u"__turnStartTime", u"__numPlayers", u"__recoverErrors", u"_runnerFullStacktrace", u"max_points", u"max_turns", u"turn", u"__me", u"__enemies", u"__orders", u"__nativeAPI", u"__icepital_holders", u"__neutral", u"__rows", u"__cols", u"__all_icebergs", u"max_turns_without_icepital", u"acceleration_cost", u"acceleration_factor", u"__clonebergs", u"cloneberg_max_pause_turns", u"cloneberg_multi_factor"]
-    _hx_methods = [u"_nextTurn", u"_shouldRecoverErrors", u"isFilePosInBot", u"_addOrder", u"_addMoveOrder", u"_getActions", u"debug", u"get_myself", u"get_enemy", u"get_all_players", u"get_time_remaining", u"get_max_turn_time", u"get_all_icepital_icebergs", u"get_my_icepital_icebergs", u"get_enemy_icepital_icebergs", u"get_neutral_icepital_icebergs", u"get_neutral", u"get_all_penguin_groups", u"get_my_penguin_groups", u"get_enemy_penguin_groups", u"_moveOrder", u"get_neutral_icebergs", u"get_all_icebergs", u"get_my_icebergs", u"get_enemy_icebergs", u"get_cloneberg"]
+    __slots__ = (u"_hx___players", u"_hx___turnTime", u"_hx___turnStartTime", u"_hx___numPlayers", u"_hx___recoverErrors", u"_runnerFullStacktrace", u"max_points", u"max_turns", u"turn", u"_hx___me", u"_hx___enemies", u"_hx___orders", u"_hx___nativeAPI", u"_hx___icepital_holders", u"_hx___neutral", u"_hx___rows", u"_hx___cols", u"_hx___all_icebergs", u"max_turns_without_icepital", u"acceleration_cost", u"acceleration_factor", u"_hx___clonebergs", u"cloneberg_max_pause_turns", u"cloneberg_multi_factor", u"go_through_siege_cost", u"siege_max_turns", u"siege_group_turns_to_destination")
+    _hx_fields = [u"__players", u"__turnTime", u"__turnStartTime", u"__numPlayers", u"__recoverErrors", u"_runnerFullStacktrace", u"max_points", u"max_turns", u"turn", u"__me", u"__enemies", u"__orders", u"__nativeAPI", u"__icepital_holders", u"__neutral", u"__rows", u"__cols", u"__all_icebergs", u"max_turns_without_icepital", u"acceleration_cost", u"acceleration_factor", u"__clonebergs", u"cloneberg_max_pause_turns", u"cloneberg_multi_factor", u"go_through_siege_cost", u"siege_max_turns", u"siege_group_turns_to_destination"]
+    _hx_methods = [u"_nextTurn", u"_shouldRecoverErrors", u"isFilePosInBot", u"_addOrder", u"_addMoveOrder", u"_getActions", u"debug", u"get_myself", u"get_enemy", u"get_all_players", u"get_time_remaining", u"get_max_turn_time", u"get_all_icepital_icebergs", u"get_my_icepital_icebergs", u"get_enemy_icepital_icebergs", u"get_neutral_icepital_icebergs", u"get_all_under_siege_icebergs", u"get_my_under_siege_icebergs", u"get_enemy_under_siege_icebergs", u"get_neutral", u"get_all_penguin_groups", u"get_my_penguin_groups", u"get_enemy_penguin_groups", u"_moveOrder", u"get_neutral_icebergs", u"get_all_icebergs", u"get_my_icebergs", u"get_enemy_icebergs", u"get_cloneberg"]
     _hx_statics = [u"__getObjectsOfEnemyPlayers_Iceberg", u"__getObjectsOfPlayer_Iceberg", u"UNKNOWN_ORDER_FILE_NAME", u"UNKNOWN_ORDER_LINE_NUMBER"]
     _hx_interfaces = []
     _hx_super = BaseObject
 
 
     def __init__(self,nativeAPI):
+        self.siege_group_turns_to_destination = None
+        self.siege_max_turns = None
+        self.go_through_siege_cost = None
         self.cloneberg_multi_factor = None
         self.cloneberg_max_pause_turns = None
         self._hx___clonebergs = None
@@ -1038,6 +1081,43 @@ class Game(BaseObject):
 
     def get_neutral_icepital_icebergs(self):
         return Game._hx___getObjectsOfPlayer_Iceberg(self._hx___icepital_holders,self._hx___neutral)
+
+    def get_all_under_siege_icebergs(self):
+        allIcebergsUnderSiege = list()
+        _g = 0
+        this1 = self._hx___all_icebergs
+        this2 = [None]*len(this1)
+        r = this2
+        haxe_ds__Vector_Vector_Impl_.blit(this1,0,r,0,len(this1))
+        _g1 = r
+        while (_g < len(_g1)):
+            iceberg = _g1[_g]
+            _g = (_g + 1)
+            if iceberg.is_under_siege:
+                allIcebergsUnderSiege.append(iceberg)
+        return allIcebergsUnderSiege
+
+    def get_my_under_siege_icebergs(self):
+        myIcebergsUnderSiege = list()
+        _g = 0
+        _g1 = Game._hx___getObjectsOfPlayer_Iceberg(self._hx___all_icebergs,self._hx___me)
+        while (_g < len(_g1)):
+            iceberg = _g1[_g]
+            _g = (_g + 1)
+            if iceberg.is_under_siege:
+                myIcebergsUnderSiege.append(iceberg)
+        return myIcebergsUnderSiege
+
+    def get_enemy_under_siege_icebergs(self):
+        myIcebergsUnderSiege = list()
+        _g = 0
+        _g1 = Game._hx___getObjectsOfEnemyPlayers_Iceberg(self._hx___all_icebergs,self._hx___me)
+        while (_g < len(_g1)):
+            iceberg = _g1[_g]
+            _g = (_g + 1)
+            if iceberg.is_under_siege:
+                myIcebergsUnderSiege.append(iceberg)
+        return myIcebergsUnderSiege
 
     def get_neutral(self):
         return self._hx___neutral
@@ -1157,6 +1237,9 @@ class Game(BaseObject):
         _hx_o._hx___clonebergs = None
         _hx_o.cloneberg_max_pause_turns = None
         _hx_o.cloneberg_multi_factor = None
+        _hx_o.go_through_siege_cost = None
+        _hx_o.siege_max_turns = None
+        _hx_o.siege_group_turns_to_destination = None
 Game._hx_class = Game
 _hx_classes[u"Game"] = Game
 
