@@ -3,8 +3,8 @@ This is an example for a bot.
 """
 from penguin_game import *
 from MyPlayer import MyPlayer
-from Utils import *
 
+player = MyPlayer()
 
 def do_turn(game):
     """
@@ -13,6 +13,5 @@ def do_turn(game):
     :param game: the current game state.
     :type game: Game
     """
-
-    player = MyPlayer(game)
+    player.set_game(game)
     player.do_turn()
