@@ -34,14 +34,14 @@ class MyPlayer:
         if my_capital.can_upgrade() and my_capital.upgrade_cost <= self.percent * my_capital.penguin_amount:
             my_capital.upgrade()
             print(my_capital, "upgraded to level", my_capital.level)
-    def attack(self,list_of_attackers):
+
+    def attack(self, list_of_attackers):
         for attacker in list_of_attackers:
             if attacker not in self.game.get_my_icepital_icebergs():
                 attacker.send_penguins(self.game.get_enemy_icepital_icebergs()[0], attacker.penguin_anount - 1)
             else:
                 attacker.send_penguins(self.game.get_enemy_icepital_icebergs()[0], attacker.penguin_anount // 2)
         print(my_iceberg, "sends", (dest_penguin_amount + 1), "penguins to", dest)
-
 
     def defend(self):
         my_icegergs = self.game.get_my_icebergs()
@@ -75,7 +75,7 @@ class MyPlayer:
         # If I want to spread
         print(self.turn_num)
         self.turn_num += 1
-        #Initial play -  here we want to spread quicly
+        # Initial play -  here we want to spread quicly
         if len(self.game.get_my_icebergs()) < 3:
             print("Initial Spreading")
             self.initial_spread()
@@ -86,7 +86,7 @@ class MyPlayer:
             if list_of_attackers:
                 print("All In Attack")
                 self.attack(list_of_attackers)
-            #If I do not attack, I want to Land & Expand with the icebregs
+            # If I do not attack, I want to Land & Expand with the icebregs
             else:
                 if 2 * game.get_my_icebergs() > game.get_all_icebergs():
                     print("Upgrade Mode")
@@ -102,7 +102,7 @@ class MyPlayer:
         :return: combination of icbergs from which to attack
         """
         my_icebergs = self.game.get_my_icebergs()
-        other_capital: Iceberg = self.game.get_enemy_icepital_icebergs()[0]
+        other_capital = self.game.get_enemy_icepital_icebergs()[0]
         my_icebergs = sorted(my_icebergs, key=lambda iceberg: iceberg.get_turns_till_arrival(other_capital))
         total = 0
         for iceberg, i in enumerate(my_icebergs):
